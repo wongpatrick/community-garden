@@ -11,7 +11,7 @@ import (
 //handleWeed
 //handlePlant
 
-//custom clamp function to clamp values between 0 and 100
+// custom clamp function to clamp values between 0 and 100
 func clamp(v, min, max float64) float64 {
 	if v < min {
 		return min
@@ -22,21 +22,24 @@ func clamp(v, min, max float64) float64 {
 	return v
 }
 
-func  applyDecay(p *Plot) {
-	p.Hydration = clamp(p.Hydration - 0.2, 0, 100)
-	p.Weeds = clamp(p.Weeds + 0.1, 0, 100)
+func applyDecay(p *Plot) {
+	if !p.Occupied {
+		return
+	}
+	p.Hydration = clamp(p.Hydration-0.5, 0, 100)
+	p.Weeds = clamp(p.Weeds+0.1, 0, 100)
 	//TODO: basic health decay formula, should be adjusted
-	p.Health = clamp(p.Hydration - p.Weeds, 0, 100)
+	p.Health = clamp(p.Hydration-p.Weeds, 0, 100)
 }
 
 func handleWater(p *Plot) {
-	p.Hydration = clamp(p.Hydration + 5, 0, 100)
-	p.Health = clamp(p.Hydration - p.Weeds, 0, 100)
+	p.Hydration = clamp(p.Hydration+20, 0, 100)
+	p.Health = clamp(p.Hydration-p.Weeds, 0, 100)
 }
 
 func handleWeed(p *Plot) {
-	p.Weeds = clamp(p.Weeds - 2, 0, 100)
-	p.Health = clamp(p.Hydration - p.Weeds, 0, 100)
+	p.Weeds = clamp(p.Weeds-2, 0, 100)
+	p.Health = clamp(p.Hydration-p.Weeds, 0, 100)
 }
 
 func handlePlant(p *Plot) error {
@@ -44,5 +47,8 @@ func handlePlant(p *Plot) error {
 		return errors.New("plot_occupied")
 	}
 	p.Occupied = true
+	p.Hydration = 100
+	p.Weeds = 0
+	p.Health = 100
 	return nil
 }
