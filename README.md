@@ -116,7 +116,7 @@ type Event struct {
     Type    string
     PlotID  string
     Version int
-    Client  *Client
+    Reply chan<- []byte
 }
 ```
 
