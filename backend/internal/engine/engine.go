@@ -62,7 +62,7 @@ func (e *GardenEngine) handleEvent(event Event) {
 	case Plant:
 		err = handlePlant(plot, &event.Crop)
 	case Harvest:
-		err = handleHarvest(plot)
+		err = e.handleHarvest(plot)
 	default:
 		e.SendError(event.Reply, "event type not found")
 		return
@@ -87,13 +87,15 @@ func (e *GardenEngine) SendError(reply chan<- []byte, errMsg string) {
 }
 
 func (e *GardenEngine) Run() {
-	ticker := time.NewTicker(100 * time.Millisecond)
+	broadcastTicker := time.NewTicker(1 * time.Millisecond)
+	decayTicker := time.NewTicker(1 * time.Second)
 	for {
 		select {
 		case event := <-e.events:
 			e.handleEvent(event)
-		case <-ticker.C:
+		case <-decayTicker.C:
 			e.applyDecayAll()
+		case <-broadcastTicker.C:
 			//broadcast the updated garden state to all clients
 			e.BroadcastState()
 		}

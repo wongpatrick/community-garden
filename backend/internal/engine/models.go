@@ -20,6 +20,7 @@ type CropProfile struct {
 	ThirstRate         float64
 	WeedSusceptibility float64
 	GrowthRate         float64
+	HarvestScore       uint64
 }
 
 var CropConfig = map[CropType]CropProfile{
@@ -27,21 +28,25 @@ var CropConfig = map[CropType]CropProfile{
 		ThirstRate:         0.5,
 		WeedSusceptibility: 0.1,
 		GrowthRate:         0.8,
+		HarvestScore:       1,
 	},
 	Wheat: {
 		ThirstRate:         0.1,
 		WeedSusceptibility: 0.05,
 		GrowthRate:         0.4,
+		HarvestScore:       2,
 	},
 	Cotton: {
 		ThirstRate:         0.2,
 		WeedSusceptibility: 0.25,
 		GrowthRate:         0.4,
+		HarvestScore:       3,
 	},
 	Strawberry: {
 		ThirstRate:         0.6,
 		WeedSusceptibility: 0.4,
 		GrowthRate:         1.2,
+		HarvestScore:       4,
 	},
 }
 
@@ -58,6 +63,7 @@ type Plot struct {
 
 type Garden struct {
 	Plots map[string]*Plot `json:"plots"`
+	Score uint64           `json:"score"`
 }
 
 func NewGarden() *Garden {

@@ -61,13 +61,16 @@ func handlePlant(p *Plot, crop *CropType) error {
 	return nil
 }
 
-func handleHarvest(p *Plot) error {
+func (e *GardenEngine) handleHarvest(p *Plot) error {
 	if !p.Occupied {
 		return errors.New("plot_not_occupied")
 	}
 	if p.Growth != 100 {
 		return errors.New("crop_not_ready")
 	}
+	cropProfile := CropConfig[p.Crop]
+
+	e.garden.Score += cropProfile.HarvestScore
 	p.Occupied = false
 	p.Crop = None
 	p.Growth = 0
