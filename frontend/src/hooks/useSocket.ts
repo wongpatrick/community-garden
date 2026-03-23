@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react"
 
 export interface Plot {
    id: string
+   crop: string
+   growth: number
    hydration: number
    weeds: number
    occupied: boolean
@@ -33,7 +35,7 @@ export function useSocket(url: string) {
          if (msg.type === 'STATE') {
             setGarden(msg.garden)
          } else if (msg.type === 'ERROR') {
-            console.error('Error from server:', msg.error)
+            console.error('Error from server:', msg.message)
          }
       }
 

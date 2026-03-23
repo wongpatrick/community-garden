@@ -40,6 +40,7 @@ func (c *Client) readPump() {
 		var incoming struct {
 			Type    engine.EventType `json:"type"`
 			PlotID  string           `json:"plotId"`
+			Crop    engine.CropType  `json:"crop"`
 			Version int              `json:"version"`
 		}
 		if err := json.Unmarshal(message, &incoming); err != nil {
@@ -54,6 +55,7 @@ func (c *Client) readPump() {
 		c.engine <- engine.Event{
 			Type:    incoming.Type,
 			PlotID:  incoming.PlotID,
+			Crop:    incoming.Crop,
 			Version: incoming.Version,
 			Reply:   reply,
 		}

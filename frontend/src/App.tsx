@@ -4,8 +4,8 @@ import Garden from './components/Garden'
 export default function App() {
   const { garden, connected, send } = useSocket('ws://localhost:8080/ws')
 
-  const handleAction = (plotId: string, type: string, version: number) => {
-    send({ type, plotId, version })
+  const handleAction = (plotId: string, type: string, version: number, crop?: string) => {
+    send({ type, plotId, version, ...(crop ? { crop } : {}) })
   }
 
   return (
