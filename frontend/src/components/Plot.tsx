@@ -2,7 +2,7 @@ import { Stage, Layer, Rect, Text, Group } from 'react-konva'
 import type { Plot as PlotType } from "../hooks/useSocket";
 import { CROP_SPRITES, STAT_SPRITES, getCropStage } from './cropSprites'
 
-type Action = 'WATER' | 'WEED' | 'PLANT' | 'HARVEST'
+type Action = 'WATER' | 'WEED' | 'PLANT' | 'HARVEST' | 'REMOVE'
 
 interface PlotProps {
    plot: PlotType,
@@ -111,9 +111,12 @@ function StatBar({ plot }: { plot: PlotType }) {
 }
 
 export default function Plot({ plot, selectedAction, onAction }: PlotProps) {
+   const isDead = plot.occupied && plot.health === 0
+
    const isDisabled =
-     (selectedAction === 'PLANT'   && plot.occupied) ||
-     (selectedAction === 'HARVEST' && !plot.occupied)
+     (selectedAction === 'PLANT'   && plot.occupied && !isDead) ||
+     (selectedAction === 'HARVEST' && (!plot.occupied || isDead)) ||
+     (selectedAction === 'REMOVE'  && !isDead)
 
    const handleClick = () => {
       if (isDisabled) return;
@@ -141,18 +144,30 @@ export default function Plot({ plot, selectedAction, onAction }: PlotProps) {
    return (
     <div
       onClick={handleClick}
-      className={`${baseClasses} bg-amber-950/80 border-2 ${getHealthStyles(plot.health)}
+      className={`${baseClasses} bg-amber-950/80 border-2 ${isDead ? 'border-gray-600 shadow-none' : getHealthStyles(plot.health)}
         ${isDisabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:brightness-110 active:scale-95'}
+        ${isDead ? 'brightness-50' : ''}
       `}
     >
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjNzg1MzNhIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiM4YjVkMzMiPjwvcmVjdD4KPC9zdmc+')] opacity-20 mix-blend-overlay pointer-events-none"></div>
+
+      {isDead && selectedAction !== 'PLANT' && (
+        <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+          <span className="bg-gray-900/90 text-gray-300 font-bold text-xs px-2 py-1 rounded border border-gray-500 tracking-widest">✗ DEAD</span>
+        </div>
+      )}
+      {isDead && selectedAction === 'PLANT' && (
+        <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+          <span className="bg-emerald-900/90 text-emerald-300 font-bold text-xs px-2 py-1 rounded border border-emerald-600 tracking-widest">CLEAR + PLANT</span>
+        </div>
+      )}
 
       <div className="p-2 flex-1 flex flex-col items-center justify-between z-10 w-full gap-2">
         <div className="w-full flex justify-start">
           <span className="font-bold text-xs text-gray-300 bg-gray-900/60 px-2 py-1 rounded shadow-sm">{plot.id}</span>
         </div>
 
-        <div className="flex-1 flex items-center justify-center filter drop-shadow-md">
+        <div className={`flex-1 flex items-center justify-center filter drop-shadow-md ${isDead ? 'grayscale' : ''}`}>
           <PixelPlant crop={plot.crop} growth={plot.growth} weeds={plot.weeds} />
         </div>
 

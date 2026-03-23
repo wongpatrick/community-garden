@@ -63,6 +63,8 @@ func (e *GardenEngine) handleEvent(event Event) {
 		err = handlePlant(plot, &event.Crop)
 	case Harvest:
 		err = e.handleHarvest(plot)
+	case Remove:
+		err = e.handleRemove(plot)
 	default:
 		e.SendError(event.Reply, "event type not found")
 		return

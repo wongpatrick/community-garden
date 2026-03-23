@@ -83,7 +83,7 @@ func NewGarden() *Garden {
 			}
 		}
 	}
-	return &Garden{Plots: plots}
+	return &Garden{Plots: plots, Score: 0}
 }
 
 type EventType string
@@ -93,6 +93,7 @@ const (
 	Weed    EventType = "WEED"
 	Plant   EventType = "PLANT"
 	Harvest EventType = "HARVEST"
+	Remove  EventType = "REMOVE"
 )
 
 type Event struct {

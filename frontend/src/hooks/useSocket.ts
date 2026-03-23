@@ -13,12 +13,21 @@ export interface Plot {
 
 export interface Garden {
    plots: Record<string, Plot>
+   score: number
 }
 
 export function useSocket(url: string) {
    const [garden, setGarden] = useState<Garden | null>(null)
    const [connected, setConnected] = useState(false)
+   const [errorMsg, setErrorMsg] = useState<string | null>(null)
    const wsRef = useRef<WebSocket | null>(null)
+   const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+   const showError = (msg: string) => {
+      setErrorMsg(msg)
+      if (errorTimerRef.current) clearTimeout(errorTimerRef.current)
+      errorTimerRef.current = setTimeout(() => setErrorMsg(null), 3000)
+   }
 
    useEffect(() => { 
       const ws = new WebSocket(url)
@@ -35,7 +44,7 @@ export function useSocket(url: string) {
          if (msg.type === 'STATE') {
             setGarden(msg.garden)
          } else if (msg.type === 'ERROR') {
-            console.error('Error from server:', msg.message)
+            showError(msg.message)
          }
       }
 
@@ -48,5 +57,5 @@ export function useSocket(url: string) {
       }
    }
 
-   return { garden, connected, send }
+   return { garden, connected, errorMsg, send }
 }

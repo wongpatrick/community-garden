@@ -5,7 +5,7 @@ import Plot from './Plot'
 import { STAT_SPRITES, CROP_SPRITES } from './cropSprites'
 import type { SpriteData } from './cropSprites'
 
-type Action = 'WATER' | 'WEED' | 'PLANT' | 'HARVEST'
+type Action = 'WATER' | 'WEED' | 'PLANT' | 'HARVEST' | 'REMOVE'
 type CropType = 'CORN' | 'WHEAT' | 'COTTON' | 'STRAWBERRY'
 
 const ACTIONS: { type: Action; spriteKey: string; label: string }[] = [
@@ -13,6 +13,7 @@ const ACTIONS: { type: Action; spriteKey: string; label: string }[] = [
   { type: 'WEED',    spriteKey: 'weeds',     label: 'Weed'    },
   { type: 'PLANT',   spriteKey: 'growth',    label: 'Plant'   },
   { type: 'HARVEST', spriteKey: 'harvest',   label: 'Harvest' },
+  { type: 'REMOVE',  spriteKey: 'health',    label: 'Remove'  },
 ]
 
 const CROPS: { type: CropType; label: string }[] = [
@@ -55,6 +56,10 @@ export default function Garden({ garden, onAction }: GardenProps) {
     <div className="flex flex-col md:flex-row gap-8 items-start">
       {/* Sidebar for actions and crops */}
       <aside className="w-full md:w-64 flex flex-col gap-6 p-4 bg-gray-800 rounded-xl border border-gray-700 shadow-lg">
+        <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Harvest Score</p>
+          <p className="text-3xl font-bold text-emerald-400">{garden.score ?? 0}</p>
+        </div>
         <div>
           <h2 className="text-xl font-bold text-gray-200 mb-4 border-b border-gray-700 pb-2">Tools</h2>
           <div className="flex flex-col gap-2">

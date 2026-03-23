@@ -33,7 +33,7 @@ func applyDecay(p *Plot) {
 }
 
 func handleWater(p *Plot) {
-	if p.Hydration == 100 {
+	if p.Hydration == 100 || p.Health == 0 {
 		return
 	}
 	p.Hydration = clamp(p.Hydration+20, 0, 100)
@@ -41,7 +41,7 @@ func handleWater(p *Plot) {
 }
 
 func handleWeed(p *Plot) {
-	if p.Weeds == 0 {
+	if p.Weeds == 0 || p.Health == 0 {
 		return
 	}
 	p.Weeds = clamp(p.Weeds-2, 0, 100)
@@ -49,7 +49,8 @@ func handleWeed(p *Plot) {
 }
 
 func handlePlant(p *Plot, crop *CropType) error {
-	if p.Occupied || p.Crop != None {
+	// Allow planting on a dead plot — clears the dead crop first
+	if p.Occupied && p.Health > 0 {
 		return errors.New("plot_occupied")
 	}
 	p.Crop = *crop
@@ -61,9 +62,28 @@ func handlePlant(p *Plot, crop *CropType) error {
 	return nil
 }
 
+func (e *GardenEngine) handleRemove(p *Plot) error {
+	if !p.Occupied {
+		return errors.New("plot_not_occupied")
+	}
+	if p.Health > 0 {
+		return errors.New("crop_not_dead")
+	}
+	p.Occupied = false
+	p.Crop = None
+	p.Growth = 0
+	p.Weeds = 0
+	p.Health = 50
+	p.Hydration = 50
+	return nil
+}
+
 func (e *GardenEngine) handleHarvest(p *Plot) error {
 	if !p.Occupied {
 		return errors.New("plot_not_occupied")
+	}
+	if p.Health == 0 {
+		return errors.New("crop_dead")
 	}
 	if p.Growth != 100 {
 		return errors.New("crop_not_ready")

@@ -2,7 +2,8 @@ import { useSocket } from './hooks/useSocket'
 import Garden from './components/Garden'
 
 export default function App() {
-  const { garden, connected, send } = useSocket('ws://localhost:8080/ws')
+  const wsUrl = import.meta.env.VITE_WS_URL ?? 'ws://localhost:8080/ws'
+  const { garden, connected, errorMsg, send } = useSocket(wsUrl)
 
   const handleAction = (plotId: string, type: string, version: number, crop?: string) => {
     send({ type, plotId, version, ...(crop ? { crop } : {}) })
@@ -11,6 +12,12 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-8 font-sans">
       <div className="max-w-6xl mx-auto">
+        {errorMsg && (
+          <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-red-900/90 border border-red-600 text-red-200 font-semibold px-5 py-3 rounded-lg shadow-xl animate-in fade-in slide-in-from-top-2 duration-200">
+            {errorMsg}
+          </div>
+        )}
+
         <header className="mb-8 flex items-center justify-between border-b border-gray-800 pb-4">
           <h1 className="text-3xl font-bold text-emerald-400">🌱 Community Garden</h1>
           <div className="flex items-center gap-2">
